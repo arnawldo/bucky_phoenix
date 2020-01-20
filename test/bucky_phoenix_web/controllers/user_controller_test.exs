@@ -1,16 +1,11 @@
 defmodule BuckyPhoenixWeb.UserControllerTest do
   use BuckyPhoenixWeb.ConnCase
 
-  alias BuckyPhoenix.Accounts
+  # alias BuckyPhoenix.Accounts
 
-  @create_attrs %{name: "some name", username: "some username"}
-  @update_attrs %{name: "some updated name", username: "some updated username"}
-  @invalid_attrs %{name: nil, username: nil}
-
-  def fixture(:user) do
-    {:ok, user} = Accounts.create_user(@create_attrs)
-    user
-  end
+  # @create_attrs %{name: "some name", username: "some username"}
+  # @update_attrs %{name: "some updated name", username: "some updated username"}
+  # @invalid_attrs %{name: nil, username: nil}
 
   # describe "index" do
   #   test "lists all users", %{conn: conn} do
@@ -81,9 +76,4 @@ defmodule BuckyPhoenixWeb.UserControllerTest do
   #       end
   #     end
   #   end
-
-  defp create_user(_) do
-    user = fixture(:user)
-    {:ok, user: user}
-  end
 end
