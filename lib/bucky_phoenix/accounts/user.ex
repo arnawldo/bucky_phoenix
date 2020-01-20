@@ -6,6 +6,7 @@ defmodule BuckyPhoenix.Accounts.User do
   schema "users" do
     field :name, :string
     field :username, :string
+    field :password, :string
 
     has_one :credential, Credential
 
@@ -15,8 +16,8 @@ defmodule BuckyPhoenix.Accounts.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:name, :username])
-    |> validate_required([:name, :username])
+    |> cast(attrs, [:name, :username, :password])
+    |> validate_required([:name, :username, :password])
     |> unique_constraint(:username)
   end
 end

@@ -3,7 +3,7 @@ use Mix.Config
 # Configure your database
 config :bucky_phoenix, BuckyPhoenix.Repo,
   username: "postgres",
-  password: "postgres",
+  password: "",
   database: "bucky_phoenix_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox

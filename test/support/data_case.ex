@@ -24,6 +24,7 @@ defmodule BuckyPhoenix.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import BuckyPhoenix.DataCase
+      import BuckyPhoenix.TestHelpers
     end
   end
 

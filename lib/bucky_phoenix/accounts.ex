@@ -122,7 +122,9 @@ defmodule BuckyPhoenix.Accounts do
 
   """
   def list_credentials do
-    Repo.all(Credential)
+    Credential
+    |> Repo.all()
+    |> Repo.preload(:user)
   end
 
   @doc """
@@ -139,7 +141,11 @@ defmodule BuckyPhoenix.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_credential!(id), do: Repo.get!(Credential, id)
+  def get_credential!(id) do
+    Credential
+    |> Repo.get!(id)
+    |> Repo.preload(:user)
+  end
 
   @doc """
   Creates a credential.
@@ -153,9 +159,9 @@ defmodule BuckyPhoenix.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_credential(attrs \\ %{}) do
+  def create_credential(%User{} = user, attrs \\ %{}) do
     %Credential{}
-    |> Credential.changeset(attrs)
+    |> Credential.changeset_with_user(user, attrs)
     |> Repo.insert()
   end
 
@@ -210,7 +216,7 @@ defmodule BuckyPhoenix.Accounts do
     query =
       from u in User,
         inner_join: c in assoc(u, :credential),
-        where: c.email == ^email and c.password == ^password
+        where: c.email == ^email and u.password == ^password
 
     case Repo.one(query) do
       %User{} = user -> {:ok, user}

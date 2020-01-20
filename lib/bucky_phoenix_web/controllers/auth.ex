@@ -9,16 +9,13 @@ defmodule BuckyPhoenixWeb.Auth do
   def call(conn, _opts) do
     cond do
       conn.assigns[:current_user] ->
-        IO.puts("Current user exists")
         conn
 
       user_id = get_session(conn, :user_id) ->
         user = Accounts.get_user!(user_id)
-        IO.puts("User Id found. Assigning current user")
         assign(conn, :current_user, user)
 
       true ->
-        IO.puts("No current user found")
         assign(conn, :current_user, nil)
     end
   end

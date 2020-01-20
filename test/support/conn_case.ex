@@ -23,6 +23,8 @@ defmodule BuckyPhoenixWeb.ConnCase do
       use Phoenix.ConnTest
       alias BuckyPhoenixWeb.Router.Helpers, as: Routes
 
+      import BuckyPhoenix.TestHelpers
+
       # The default endpoint for testing
       @endpoint BuckyPhoenixWeb.Endpoint
     end

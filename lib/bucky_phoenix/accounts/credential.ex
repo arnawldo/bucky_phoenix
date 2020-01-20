@@ -5,7 +5,6 @@ defmodule BuckyPhoenix.Accounts.Credential do
 
   schema "credentials" do
     field :email, :string
-    field :password, :string
 
     belongs_to :user, User
 
@@ -15,8 +14,13 @@ defmodule BuckyPhoenix.Accounts.Credential do
   @doc false
   def changeset(credential, attrs) do
     credential
-    |> cast(attrs, [:email, :password])
-    |> validate_required([:email, :password])
+    |> cast(attrs, [:email])
+    |> validate_required([:email])
     |> unique_constraint(:email)
+  end
+
+  def changeset_with_user(credential, %User{} = user, attrs) do
+    changeset(credential, attrs)
+    |> put_assoc(:user, user)
   end
 end

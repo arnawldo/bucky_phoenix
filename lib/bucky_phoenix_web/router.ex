@@ -23,6 +23,8 @@ defmodule BuckyPhoenixWeb.Router do
     resources "/sessions", SessionController,
       only: [:new, :create, :delete],
       singleton: true
+
+    resources "/lists", ListController
   end
 
   # Other scopes may use custom stacks.

@@ -1,55 +1,87 @@
 defmodule BuckyPhoenix.AccountsTest do
-  use BuckyPhoenix.DataCase
+  use BuckyPhoenix.DataCase, async: true
 
   alias BuckyPhoenix.Accounts
 
   describe "users" do
     alias BuckyPhoenix.Accounts.User
 
-    @valid_attrs %{name: "some name", username: "some username"}
-    @update_attrs %{name: "some updated name", username: "some updated username"}
-    @invalid_attrs %{name: nil, username: nil}
-
-    def user_fixture(attrs \\ %{}) do
-      {:ok, user} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Accounts.create_user()
-
-      user
-    end
+    @valid_attrs %{
+      name: "some name",
+      username: "some username",
+      password: "some password",
+      credential: %{email: "some email"}
+    }
+    @update_attrs %{
+      name: "some updated name",
+      username: "some updated username",
+      password: "some updated password"
+    }
+    @invalid_attrs %{name: nil, username: nil, password: nil, credential: %{email: nil}}
 
     test "list_users/0 returns all users" do
-      user = user_fixture()
-      assert Accounts.list_users() == [user]
+      %User{id: id} = user_fixture()
+      assert [%User{id: ^id}] = Accounts.list_users()
     end
 
     test "get_user!/1 returns the user with given id" do
-      user = user_fixture()
-      assert Accounts.get_user!(user.id) == user
+      %User{id: id} = user_fixture()
+      assert %User{id: ^id} = Accounts.get_user!(id)
     end
 
     test "create_user/1 with valid data creates a user" do
       assert {:ok, %User{} = user} = Accounts.create_user(@valid_attrs)
-      assert user.name == "some name"
-      assert user.username == "some username"
+      assert user.name == @valid_attrs[:name]
+      assert user.username == @valid_attrs[:username]
     end
 
     test "create_user/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_user(@invalid_attrs)
+      assert {:error, changeset} = Accounts.create_user(@invalid_attrs)
+
+      assert %{
+               credential: %{email: ["can't be blank"]},
+               name: ["can't be blank"],
+               password: ["can't be blank"],
+               username: ["can't be blank"]
+             } = errors_on(changeset)
+
+      assert [] == Accounts.list_users()
     end
 
     test "update_user/2 with valid data updates the user" do
       user = user_fixture()
-      assert {:ok, %User{} = user} = Accounts.update_user(user, @update_attrs)
-      assert user.name == "some updated name"
-      assert user.username == "some updated username"
+
+      # Update of nested entity needs primary therefore creating resources then building updated attrs
+      update_attrs =
+        Enum.into(
+          %{credential: %{id: user.credential.id, email: "some updated email"}},
+          @update_attrs
+        )
+
+      assert {:ok, %User{} = user} = Accounts.update_user(user, update_attrs)
+      assert user.name == update_attrs[:name]
+      assert user.username == update_attrs[:username]
     end
 
     test "update_user/2 with invalid data returns error changeset" do
       user = user_fixture()
-      assert {:error, %Ecto.Changeset{}} = Accounts.update_user(user, @invalid_attrs)
-      assert user == Accounts.get_user!(user.id)
+
+      # Update of nested entity needs primary therefore creating resources then building updated attrs
+      invalid_attrs =
+        Enum.into(%{credential: %{id: user.credential.id, email: nil}}, @invalid_attrs)
+
+      assert {:error, changeset} = Accounts.update_user(user, invalid_attrs)
+
+      assert %{
+               name: ["can't be blank"],
+               password: ["can't be blank"],
+               username: ["can't be blank"],
+               credential: %{email: ["can't be blank"]}
+             } = errors_on(changeset)
+
+      user = Accounts.get_user!(user.id)
+      assert user.name != invalid_attrs[:name]
+      assert user.username != invalid_attrs[:username]
     end
 
     test "delete_user/1 deletes the user" do
@@ -61,133 +93,6 @@ defmodule BuckyPhoenix.AccountsTest do
     test "change_user/1 returns a user changeset" do
       user = user_fixture()
       assert %Ecto.Changeset{} = Accounts.change_user(user)
-    end
-  end
-
-  describe "credentials" do
-    alias BuckyPhoenix.Accounts.Credentials
-
-    @valid_attrs %{email: "some email"}
-    @update_attrs %{email: "some updated email"}
-    @invalid_attrs %{email: nil}
-
-    def credentials_fixture(attrs \\ %{}) do
-      {:ok, credentials} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Accounts.create_credentials()
-
-      credentials
-    end
-
-    test "list_credentials/0 returns all credentials" do
-      credentials = credentials_fixture()
-      assert Accounts.list_credentials() == [credentials]
-    end
-
-    test "get_credentials!/1 returns the credentials with given id" do
-      credentials = credentials_fixture()
-      assert Accounts.get_credentials!(credentials.id) == credentials
-    end
-
-    test "create_credentials/1 with valid data creates a credentials" do
-      assert {:ok, %Credentials{} = credentials} = Accounts.create_credentials(@valid_attrs)
-      assert credentials.email == "some email"
-    end
-
-    test "create_credentials/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_credentials(@invalid_attrs)
-    end
-
-    test "update_credentials/2 with valid data updates the credentials" do
-      credentials = credentials_fixture()
-
-      assert {:ok, %Credentials{} = credentials} =
-               Accounts.update_credentials(credentials, @update_attrs)
-
-      assert credentials.email == "some updated email"
-    end
-
-    test "update_credentials/2 with invalid data returns error changeset" do
-      credentials = credentials_fixture()
-
-      assert {:error, %Ecto.Changeset{}} =
-               Accounts.update_credentials(credentials, @invalid_attrs)
-
-      assert credentials == Accounts.get_credentials!(credentials.id)
-    end
-
-    test "delete_credentials/1 deletes the credentials" do
-      credentials = credentials_fixture()
-      assert {:ok, %Credentials{}} = Accounts.delete_credentials(credentials)
-      assert_raise Ecto.NoResultsError, fn -> Accounts.get_credentials!(credentials.id) end
-    end
-
-    test "change_credentials/1 returns a credentials changeset" do
-      credentials = credentials_fixture()
-      assert %Ecto.Changeset{} = Accounts.change_credentials(credentials)
-    end
-  end
-
-  describe "credentials" do
-    alias BuckyPhoenix.Accounts.Credential
-
-    @valid_attrs %{email: "some email"}
-    @update_attrs %{email: "some updated email"}
-    @invalid_attrs %{email: nil}
-
-    def credential_fixture(attrs \\ %{}) do
-      {:ok, credential} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Accounts.create_credential()
-
-      credential
-    end
-
-    test "list_credentials/0 returns all credentials" do
-      credential = credential_fixture()
-      assert Accounts.list_credentials() == [credential]
-    end
-
-    test "get_credential!/1 returns the credential with given id" do
-      credential = credential_fixture()
-      assert Accounts.get_credential!(credential.id) == credential
-    end
-
-    test "create_credential/1 with valid data creates a credential" do
-      assert {:ok, %Credential{} = credential} = Accounts.create_credential(@valid_attrs)
-      assert credential.email == "some email"
-    end
-
-    test "create_credential/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_credential(@invalid_attrs)
-    end
-
-    test "update_credential/2 with valid data updates the credential" do
-      credential = credential_fixture()
-
-      assert {:ok, %Credential{} = credential} =
-               Accounts.update_credential(credential, @update_attrs)
-
-      assert credential.email == "some updated email"
-    end
-
-    test "update_credential/2 with invalid data returns error changeset" do
-      credential = credential_fixture()
-      assert {:error, %Ecto.Changeset{}} = Accounts.update_credential(credential, @invalid_attrs)
-      assert credential == Accounts.get_credential!(credential.id)
-    end
-
-    test "delete_credential/1 deletes the credential" do
-      credential = credential_fixture()
-      assert {:ok, %Credential{}} = Accounts.delete_credential(credential)
-      assert_raise Ecto.NoResultsError, fn -> Accounts.get_credential!(credential.id) end
-    end
-
-    test "change_credential/1 returns a credential changeset" do
-      credential = credential_fixture()
-      assert %Ecto.Changeset{} = Accounts.change_credential(credential)
     end
   end
 end
