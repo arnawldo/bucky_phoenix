@@ -20,7 +20,10 @@ defmodule BuckyPhoenixWeb.Router do
     get "/", PageController, :index
 
     resources "/users", UserController
-    resources "/lists", ListController
+
+    resources "/lists", ListController do
+      resources "/tasks", TaskController
+    end
 
     resources "/sessions", SessionController,
       only: [:new, :create, :delete],

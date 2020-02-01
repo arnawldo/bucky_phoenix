@@ -6,6 +6,9 @@
     <strong>Name:</strong>
     <%= @list.name %>
   </li>
+  <li>
+    <%= link "Create new Task", to: Routes.list_task_path(@conn, :new, @list) %>
+  </li>
 
 </ul>
 
