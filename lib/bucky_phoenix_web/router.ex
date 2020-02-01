@@ -18,7 +18,12 @@ defmodule BuckyPhoenixWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+
     resources "/users", UserController
+
+    resources "/lists", ListController do
+      resources "/tasks", TaskController
+    end
 
     resources "/sessions", SessionController,
       only: [:new, :create, :delete],

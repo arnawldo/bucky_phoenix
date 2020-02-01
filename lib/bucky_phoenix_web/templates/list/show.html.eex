@@ -1,0 +1,16 @@
+<h1>Show List</h1>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @list.name %>
+  </li>
+  <li>
+    <%= link "Create new Task", to: Routes.list_task_path(@conn, :new, @list) %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.list_path(@conn, :edit, @list) %></span>
+<span><%= link "Back", to: Routes.list_path(@conn, :index) %></span>

@@ -26,7 +26,7 @@
             <% end %>
           </ul>
         </nav>
-        <h1>Bucky</h1>
+        <h1><%= link "Bucky", to: Routes.page_path(@conn, :index) %></h1>
       </section>
     </header>
     <main role="main" class="container">

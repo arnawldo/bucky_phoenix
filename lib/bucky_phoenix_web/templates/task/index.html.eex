@@ -1,0 +1,27 @@
+<h1><%= @list.name %></h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for task <- @tasks do %>
+    <tr>
+      <td><%= task.name %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.list_task_path(@conn, :show, @list, task) %></span>
+        <span><%= link "Edit", to: Routes.list_task_path(@conn, :edit, @list, task) %></span>
+        <span><%= link "Delete", to: Routes.list_task_path(@conn, :delete, @list, task), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Task", to: Routes.list_task_path(@conn, :new, @list) %></span>
+<span><%= link "View your lists", to: Routes.list_path(@conn, :index) %></span>
